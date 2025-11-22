@@ -9,3 +9,14 @@ count(*) as age_count
 from customers c
 group by age_category 
 order by age_category 
+
+ЗАПРОС 2
+
+select to_char(s.sale_date, 'YYYY-MM') as selling_month,
+COUNT(DISTINCT c.customer_id) as total_customers,
+sum(p.price * s.quantity) as income
+from customers as c
+inner join sales as s on c.customer_id = s.customer_id 
+join products as p on s.product_id = p.product_id
+group by 1
+order by 1 
