@@ -25,7 +25,7 @@ limit 10 -- выводит только первые 10 записей
  -- lowest_average_income
 
 with overall_average as ( -- объявляем временную таблицу (CTE) с именем overall_average
-select round(avg(p.price * s.quantity), 0) as avg_income -- считаем среднюю выручку по всем продажам, округляем до целого, присваиваем alias avg_income
+select avg(p.price * s.quantity) as avg_income -- считаем среднюю выручку по всем продажам, округляем до целого, присваиваем alias avg_income
 from customers c -- из таблицы клиентов
 join sales s on c.customer_id = s.customer_id -- присоединяем продажи по идентификатору клиента
 join products p on s.product_id = p.product_id -- присоединяем товары по идентификатору товара
@@ -52,7 +52,7 @@ inner join sales as s on c.customer_id = s.customer_id -- соединение �
 join products as p on s.product_id = p.product_id -- соединение продаж с товарами по id товара
 join employees as e on e.employee_id = s.sales_person_id
 group by 1, 2, extract(isodow from s.sale_date) -- группировка по именю, названию дня и числовому дню недели
-order by seller, extract(isodow from s.sale_date); -- сортировка сначала по продавцу, затем по порядковому номеру дня недели
+order by extract(isodow from s.sale_date), seller; -- сортировка сначала по продавцу, затем по порядковому номеру дня недели
 
  -- top_10_profitable_products
 
