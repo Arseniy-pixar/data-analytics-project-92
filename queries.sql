@@ -31,7 +31,7 @@ join sales s on c.customer_id = s.customer_id -- присоединяем про
 join products p on s.product_id = p.product_id -- присоединяем товары по идентификатору товара
 )
 select concat(e.first_name, ' ', e.last_name) as seller, -- формируем название продавца (имя + фамилия)
-       floor(avg(p.price * s.quantity) as average_income -- считаем среднюю выручку продавца за сделки, округляем
+       floor(avg(p.price * s.quantity)) as average_income -- считаем среднюю выручку продавца за сделки, округляем
 from customers c -- таблица клиентов
 join sales s on c.customer_id = s.customer_id -- присоединение продаж
 join products p on s.product_id = p.product_id -- присоединение товаров
