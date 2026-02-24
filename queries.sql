@@ -31,7 +31,7 @@ join sales s on c.customer_id = s.customer_id -- присоединяем про
 join products p on s.product_id = p.product_id -- присоединяем товары по идентификатору товара
 )
 select concat(e.first_name, ' ', e.last_name) as seller, -- формируем название продавца (имя + фамилия)
-       round(avg(p.price * s.quantity), 0) as average_income -- считаем среднюю выручку продавца за сделки, округляем
+       floor(avg(p.price * s.quantity) as average_income -- считаем среднюю выручку продавца за сделки, округляем
 from customers c -- таблица клиентов
 join sales s on c.customer_id = s.customer_id -- присоединение продаж
 join products p on s.product_id = p.product_id -- присоединение товаров
@@ -46,7 +46,7 @@ order by average_income asc -- сортируем по средней выруч
 select
   concat(e.first_name,' ', e.last_name) as seller, -- формирует столбец 'seller' с именем и фамилией продавца
   trim(to_char(s.sale_date, 'Day')) as day_of_week, -- название дня недели (на английском), с удалением лишних пробелов
-  round(sum(p.price * s.quantity), 0) as income -- вычисляет общую сумму выручки за все сделки продавца за выбранный день
+  floor(sum(p.price * s.quantity) as income -- вычисляет общую сумму выручки за все сделки продавца за выбранный день
 from customers as c -- таблица клиентов с псевдонимом c
 inner join sales as s on c.customer_id = s.customer_id -- соединение клиентов с продажами по id клиента
 join products as p on s.product_id = p.product_id -- соединение продаж с товарами по id товара
