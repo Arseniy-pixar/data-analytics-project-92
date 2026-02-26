@@ -54,27 +54,6 @@ join employees as e on e.employee_id = s.sales_person_id
 group by 1, 2, extract(isodow from s.sale_date) -- группировка по именю, названию дня и числовому дню недели
 order by extract(isodow from s.sale_date), seller; -- сортировка сначала по продавцу, затем по порядковому номеру дня недели
 
- -- top_10_profitable_products
-
-select 
-  p.product_id as ProductID,
-  floor(sum(p.price * s.quantity)) as Amount -- правильно округляем сумму в меньшую сторону
-from products p
-inner join sales s on p.product_id = s.product_id -- соединяем товары и продажи
-group by p.product_id -- группируем по ID товара
-order by Amount desc -- сортируем по сумме, чтобы самые большие были в начале
-limit 10;
-
- -- top_10_popular_products
-
-SELECT 
-  p.product_id AS ProductID,
-  SUM(s.quantity) AS TotalQuantity
-FROM products p
-JOIN sales s ON p.product_id = s.product_id
-GROUP BY p.product_id
-ORDER BY TotalQuantity DESC
-LIMIT 10;
 
  -- age_category
 
