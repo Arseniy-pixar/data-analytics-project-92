@@ -57,7 +57,7 @@ order by average_income asc -- сортируем по средней выруч
   
 select
   concat(e.first_name,' ', e.last_name) as seller, -- формирует столбец 'seller' с именем и фамилией продавца
-  trim(to_char(s.sale_date, 'Day')) as day_of_week, -- название дня недели (на английском), с удалением лишних пробелов
+  trim(to_char(s.sale_date, 'day')) as day_of_week, -- название дня недели (на английском), с удалением лишних пробелов
   floor(sum(p.price * s.quantity)) as income -- вычисляет общую сумму выручки за все сделки продавца за выбранный день
 from customers as c -- таблица клиентов с псевдонимом c
 inner join sales as s on c.customer_id = s.customer_id -- соединение клиентов с продажами по id клиента
