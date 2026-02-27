@@ -12,7 +12,7 @@ order by 1 -- сортирует результат по тому же полю,
  -- top_10_total_income
 
 select
-    concat(c.first_name, ' ', c.last_name) as seller, -- создаёт столбец 'seller' с именем и фамилией продавца, объединёнными через пробел
+    concat(e.first_name, ' ', e.last_name) as seller, -- создаёт столбец 'seller' с именем и фамилией продавца, объединёнными через пробел
     count(p.price * s.quantity) as operation, -- считает количество операций (продаж), в данном случае — количество строк, умноженных на цену, что некорректно — лучше считать строки или сумму продаж
     -- сумма выручки продавца, округлённая в меньшую сторону
     floor(sum(p.price * s.quantity)) as income
@@ -22,7 +22,7 @@ inner join sales as s on c.customer_id = s.customer_id
 -- соединяет таблицы продаж и продуктов по идентификатору товара
 inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
-group by c.first_name, c.last_name -- группирует по имени и фамилии продавца
+group by e.first_name, e.last_name -- группирует по имени и фамилии продавца
 order by income desc -- сортирует по выручке в порядке убывания
 limit 10 -- выводит только первые 10 записей
 
