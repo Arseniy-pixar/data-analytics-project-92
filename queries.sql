@@ -1,105 +1,92 @@
- -- customers_by_month
+select
+    to_char(s.sale_date, 'YYYY-MM') as selling_month,
+    count(distinct c.customer_id) as total_customers,
+    floor(sum(p.price * s.quantity)) as income
+from customers as c
+inner join sales as s on c.customer_id = s.customer_id
+inner join products as p on s.product_id = p.product_id
+group by 1
+order by 1;
 
-select to_char(s.sale_date, 'YYYY-MM') as selling_month, -- преобразует дату продажи в формат 'ГОД-МЕСЯЦ' и задает алиас 'selling_month'
-COUNT(DISTINCT c.customer_id) as total_customers, -- подсчитывает уникальных покупателей за месяц
-floor(sum(p.price * s.quantity)) as income -- суммирует выручку за месяц (цена товара умноженная на количество) и округляет в меньшую сторону
-from customers as c -- таблица клиентов с псевдонимом c
-inner join sales as s on c.customer_id = s.customer_id -- соединяет клиентов с продажами по ID клиента
-join products as p on s.product_id = p.product_id -- соединяет продажи с товарами по ID товара
-group by 1 -- группирует данные по первому выбранному полю (сюда входит 'YYYY-MM')
-order by 1 -- сортирует результат по тому же полю, по месяцу
-
- -- top_10_total_income
 
 select
-    concat(e.first_name, ' ', e.last_name) as seller, -- создаёт столбец 'seller' с именем и фамилией продавца, объединёнными через пробел
-    count(p.price * s.quantity) as operations, -- считает количество операций (продаж), в данном случае — количество строк, умноженных на цену, что некорректно — лучше считать строки или сумму продаж
-    -- сумма выручки продавца, округлённая в меньшую сторону
+    concat(e.first_name, ' ', e.last_name) as seller,
+    count(p.price * s.quantity) as operations,
     floor(sum(p.price * s.quantity)) as income
-from customers as c -- таблица клиентов с алиасом c
--- соединяет таблицы клиентов и продаж по идентификатору клиента
+from customers as c
 inner join sales as s on c.customer_id = s.customer_id
--- соединяет таблицы продаж и продуктов по идентификатору товара
 inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
-group by e.first_name, e.last_name -- группирует по имени и фамилии продавца
-order by income desc -- сортирует по выручке в порядке убывания
-limit 10 -- выводит только первые 10 записей
+group by e.first_name, e.last_name
+order by income desc
+limit 10;
 
- -- lowest_average_income
 
--- объявляем временную таблицу (CTE) с именем overall_average
 with overall_average as (
-    select avg(p.price * s.quantity) as avg_income -- считаем среднюю выручку по всем продажам, округляем до целого, присваиваем alias avg_income
-    from customers as c -- из таблицы клиентов
-    -- присоединяем продажи по идентификатору клиента
+    select avg(p.price * s.quantity) as avg_income
+    from customers as c
     inner join sales as s on c.customer_id = s.customer_id
-    -- присоединяем товары по идентификатору товара
     inner join products as p on s.product_id = p.product_id
 )
 
 select
-    -- формируем название продавца (имя + фамилия)
     concat(e.first_name, ' ', e.last_name) as seller,
-    -- считаем среднюю выручку продавца за сделки, округляем
     floor(avg(p.price * s.quantity)) as average_income
-from customers as c -- таблица клиентов
-inner join sales as s on c.customer_id = s.customer_id -- присоединение продаж
-inner join products as p on s.product_id = p.product_id -- присоединение товаров
+from customers as c
+inner join sales as s on c.customer_id = s.customer_id
+inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
-cross join overall_average as o -- кросс-присоединение с общей средней, чтобы получить это значение в каждой строке
--- группируем по продавцам и по общей средней выручке
+cross join overall_average as o
 group by e.first_name, e.last_name, o.avg_income
-having avg(p.price * s.quantity) < o.avg_income -- фильтрация: выбираем только тех продавцов, у которых средняя выручка за сделку меньше общей
-order by average_income asc -- сортируем по средней выручке по возрастанию
-
- -- day_of_the_week_income
-  
+having avg(p.price * s.quantity) < o.avg_income
+order by average_income asc;
+ 
 select
-  concat(e.first_name,' ', e.last_name) as seller, -- формирует столбец 'seller' с именем и фамилией продавца
-  trim(to_char(s.sale_date, 'day')) as day_of_week, -- название дня недели (на английском), с удалением лишних пробелов
-  floor(sum(p.price * s.quantity)) as income -- вычисляет общую сумму выручки за все сделки продавца за выбранный день
-from customers as c -- таблица клиентов с псевдонимом c
-inner join sales as s on c.customer_id = s.customer_id -- соединение клиентов с продажами по id клиента
-join products as p on s.product_id = p.product_id -- соединение продаж с товарами по id товара
-join employees as e on e.employee_id = s.sales_person_id
-group by 1, 2, extract(isodow from s.sale_date) -- группировка по именю, названию дня и числовому дню недели
-order by extract(isodow from s.sale_date), seller; -- сортировка сначала по продавцу, затем по порядковому номеру дня недели
+    concat(e.first_name, ' ', e.last_name) as seller,
+    trim(to_char(s.sale_date, 'day')) as day_of_week,
+    floor(sum(p.price * s.quantity)) as income
+from customers as c
+inner join sales as s on c.customer_id = s.customer_id
+inner join products as p on s.product_id = p.product_id
+inner join employees as e on s.sales_person_id = e.employee_id
+group by 1, 2, extract(isodow from s.sale_date)
+order by extract(isodow from s.sale_date), seller;
+
+ select
+    case
+        when age >= 16 and age <= 25 then '16-25'
+        when age >= 26 and age <= 40 then '26-40'
+        when age > 40 then '40+'
+    end as age_category,
+    count(*) as age_count
+from customers
+group by age_category
+order by age_category;
 
 
- -- age_category
-
-select
-  case when age >= 16 and age <= 25 then '16-25' -- определяет категорию '16-25' для возрастов от 16 до 25 включительно
-  when age >= 26 and age <= 40 then '26-40' -- категория '26-40' для возрастов от 26 до 40
-  when age > 40 then '40+' -- категория '40+' для возрастов больше 40
-end as age_category, -- присваивает результат выражения алиасу 'age_category'
-count(*) as age_count -- подсчитывает количество клиентов в каждой возрастной категории
-from customers c -- таблица клиентов с псевдонимом c
-group by age_category -- группирует по возрастной категории
-order by age_category -- сортирует результаты по возрастной категории в алфавитном порядке
-
- -- special_offer
-
-WITH first_acquisition AS ( -- объявляем временную таблицу (CTE), где будем хранить первую акционную покупку каждого клиента
-  SELECT
-    c.customer_id, -- идентификатор клиента
-    c.first_name as customer_first_name, -- имя клиента
-    c.last_name as customer_last_name, -- фамилия клиента
-    s.sale_date, -- дата покупки
-    e.first_name AS seller_first_name, -- имя продавца, связанного с продажей
-    e.last_name AS seller_last_name, -- фамилия продавца
-    ROW_NUMBER() OVER (PARTITION BY c.customer_id ORDER BY s.sale_date) AS rn -- нумерация покупок каждого клиента по дате, чтобы выделить первую
-  FROM customers c -- таблица клиентов с псевдонимом c
-  JOIN sales s ON c.customer_id = s.customer_id -- соединение клиентов с продажами по ID клиента
-  JOIN employees e ON e.employee_id = s.sales_person_id -- соединение продаж с продавцами по ID продавца
-  JOIN products p ON s.product_id = p.product_id -- соединение продаж с товарами по ID товара
-  WHERE p.price = 0 -- фильтр — только товары по акции (стоимость = 0)
+WITH first_acquisition AS (
+    SELECT
+        c.customer_id,
+        c.first_name AS customer_first_name,
+        c.last_name AS customer_last_name,
+        s.sale_date,
+        e.first_name AS seller_first_name,
+        e.last_name AS seller_last_name,
+        ROW_NUMBER()
+            OVER (PARTITION BY c.customer_id ORDER BY s.sale_date)
+            AS rn
+    FROM customers AS c
+    INNER JOIN sales AS s ON c.customer_id = s.customer_id
+    INNER JOIN employees AS e ON s.sales_person_id = e.employee_id
+    INNER JOIN products AS p ON s.product_id = p.product_id
+    WHERE p.price = 0
 )
-select 
-  concat(customer_first_name,' ', customer_last_name) as customer, -- объединение имени и фамилии клиента в полном виде
-  sale_date, -- дата первой акции
-  concat(seller_first_name,' ', seller_last_name) as seller -- объединение имени и фамилии продавца
-from first_acquisition -- из временной таблицы
-where rn = 1 -- выбираем только первую покупку каждого клиента (самое раннее событие)
-order by customer; -- сортируем по имени клиента
+
+SELECT
+    sale_date,
+    CONCAT(customer_first_name, ' ', customer_last_name) AS customer,
+    CONCAT(seller_first_name, ' ', seller_last_name) AS seller
+FROM first_acquisition
+WHERE rn = 1
+ORDER BY customer;
+
