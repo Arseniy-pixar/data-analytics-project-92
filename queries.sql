@@ -20,7 +20,6 @@ group by seller
 order by income desc
 limit 10;
 
-
 with overall_average as (
     select avg(p.price * s.quantity) as avg_income
     from customers as c
