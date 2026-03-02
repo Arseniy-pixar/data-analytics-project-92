@@ -63,28 +63,28 @@ from customers
 group by age_category
 order by age_category;
 
-WITH first_acquisition AS (
-    SELECT
+with first_acquisition as (
+    select
         c.customer_id,
-        c.first_name AS customer_first_name,
-        c.last_name AS customer_last_name,
+        c.first_name as customer_first_name,
+        c.last_name as customer_last_name,
         s.sale_date,
-        e.first_name AS seller_first_name,
-        e.last_name AS seller_last_name,
-        ROW_NUMBER()
-            OVER (PARTITION BY c.customer_id ORDER BY s.sale_date)
-            AS rn
-    FROM customers AS c
-    INNER JOIN sales AS s ON c.customer_id = s.customer_id
-    INNER JOIN employees AS e ON s.sales_person_id = e.employee_id
-    INNER JOIN products AS p ON s.product_id = p.product_id
-    WHERE p.price = 0
+        e.first_name as seller_first_name,
+        e.last_name as seller_last_name,
+        row_number()
+            over (partition by c.customer_id order by s.sale_date)
+            as rn
+    from customers as c
+    inner join sales as s on c.customer_id = s.customer_id
+    inner join employees as e on s.sales_person_id = e.employee_id
+    inner join products as p on s.product_id = p.product_id
+    where p.price = 0
 )
 
-SELECT
+select
     sale_date,
-    CONCAT(customer_first_name, ' ', customer_last_name) AS customer,
-    CONCAT(seller_first_name, ' ', seller_last_name) AS seller
-FROM first_acquisition
-WHERE rn = 1
-ORDER BY customer;
+    concat(customer_first_name, ' ', customer_last_name) as customer,
+    concat(seller_first_name, ' ', seller_last_name) as seller
+from first_acquisition
+where rn = 1
+order by customer;
