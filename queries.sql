@@ -5,9 +5,8 @@ select
 from customers as c
 inner join sales as s on c.customer_id = s.customer_id
 inner join products as p on s.product_id = p.product_id
-group by 1
-order by 1;
-
+group by selling_month
+order by selling_month;
 
 select
     concat(e.first_name, ' ', e.last_name) as seller,
@@ -17,7 +16,7 @@ from customers as c
 inner join sales as s on c.customer_id = s.customer_id
 inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
-group by e.first_name, e.last_name
+group by seller
 order by income desc
 limit 10;
 
@@ -37,7 +36,7 @@ inner join sales as s on c.customer_id = s.customer_id
 inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
 cross join overall_average as o
-group by e.first_name, e.last_name, o.avg_income
+group by seller, o.avg_income
 having avg(p.price * s.quantity) < o.avg_income
 order by average_income asc;
  
