@@ -49,8 +49,8 @@ from customers as c
 inner join sales as s on c.customer_id = s.customer_id
 inner join products as p on s.product_id = p.product_id
 inner join employees as e on s.sales_person_id = e.employee_id
-group by 1, 2
-order by 2, 1;
+group by 1, 2, extract(isodow from s.sale_date)
+order by extract(isodow from s.sale_date), seller;
 
  select
     case
