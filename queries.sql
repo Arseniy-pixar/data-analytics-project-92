@@ -63,7 +63,6 @@ from customers
 group by age_category
 order by age_category;
 
-
 WITH first_acquisition AS (
     SELECT
         c.customer_id,
@@ -80,7 +79,7 @@ WITH first_acquisition AS (
     INNER JOIN employees AS e ON s.sales_person_id = e.employee_id
     INNER JOIN products AS p ON s.product_id = p.product_id
     WHERE p.price = 0
-    )
+)
 
 SELECT
     sale_date,
