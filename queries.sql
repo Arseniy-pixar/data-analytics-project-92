@@ -52,7 +52,7 @@ inner join employees as e on s.sales_person_id = e.employee_id
 group by seller, day_of_week, extract(isodow from s.sale_date)
 order by extract(isodow from s.sale_date), seller;
 
- select
+select
     case
         when age >= 16 and age <= 25 then '16-25'
         when age >= 26 and age <= 40 then '26-40'
@@ -85,7 +85,7 @@ WITH first_acquisition AS (
 SELECT
     sale_date,
     CONCAT(customer_first_name, ' ', customer_last_name) AS customer,
-    CONCAT(seller_first_name, ' ', seller_last_name) AS seller
+    CONCAT(seller_first_name, ' ', seller_last_name) AS seller;
 FROM first_acquisition
 WHERE rn = 1
 ORDER BY customer;
