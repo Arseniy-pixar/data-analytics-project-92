@@ -80,13 +80,12 @@ WITH first_acquisition AS (
     INNER JOIN employees AS e ON s.sales_person_id = e.employee_id
     INNER JOIN products AS p ON s.product_id = p.product_id
     WHERE p.price = 0
-)
+    )
 
 SELECT
     sale_date,
     CONCAT(customer_first_name, ' ', customer_last_name) AS customer,
-    CONCAT(seller_first_name, ' ', seller_last_name) AS seller;
+    CONCAT(seller_first_name, ' ', seller_last_name) AS seller
 FROM first_acquisition
 WHERE rn = 1
 ORDER BY customer;
-
