@@ -38,7 +38,7 @@ cross join overall_average as o
 group by seller, o.avg_income
 having avg(p.price * s.quantity) < o.avg_income
 order by average_income asc;
- 
+
 select
     concat(e.first_name, ' ', e.last_name) as seller,
     trim(to_char(s.sale_date, 'day')) as day_of_week,
